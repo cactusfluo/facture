@@ -17,6 +17,43 @@ func	toChaincodeArgs(args ...string) [][]byte {
 	return bargs
 }
 
+func	removeBillFromList(list []string, billId string) ([]string, error) {
+	var	i			int
+	var	id			string
+
+	for i, id = range list {
+		if id == billId {
+			list[len(list)-1], list[i] = list[i], list[len(list)-1]
+			return list[:len(list)-1], nil
+		}
+	}
+	return nil, fmt.Errorf("Cannot find bill Id in owner object")
+}
+
+func	deleteBill(ownerId string, billId string) error {
+	var	err			error
+	var	user		UserInfos
+	var	userBytes	[]byte
+
+	user, err = getUserInfos(ownerId)
+	if err != nil {
+		return fmt.Errorf("Cannot get owner informations: %s", err)
+	}
+	user.Bills, err = removeBillFromList(user.Bills, billId)
+	if err != nil {
+		return err
+	}
+	userBytes, err = json.Marshal(user)
+	if err != nil {
+		return fmt.Errorf("Cannot marshal owner object: %s", err)
+	}
+	err = STUB.PutState(ownerId, userBytes)
+	if err != nil {
+		return fmt.Errorf("Cannot update owner object: %s", err)
+	}
+	return nil
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,11 +93,14 @@ func	payBill(args []string) (string, error) {
 		return "", fmt.Errorf("Cannot transfer assets for the bill: %s", response.Message)
 	}
 
-	/// DELETE BILL
+	/// DELETE BILL FROM LEDGER
 	err = STUB.DelState(string(billBytes))
 	if err != nil {
 		return "", fmt.Errorf("Cannot delete bill: %s", err)
 	}
+
+	/// DELETE BILL FROM OWNER
+	deleteBill(bill.OwnerIfmt.Errorf("Cannot find bill Id in owner object")d, billId)
 
 	return string(billBytes), nil
 }
