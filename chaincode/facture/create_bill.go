@@ -35,28 +35,28 @@ func	createBill(args []string) (string, error) {
 	var	items		[]Item
 
 	/// CHECK ARGUMENTS
-	if len(args) != 3 {
-		return "", fmt.Errorf("createBill requires two arguments. A bill Id, and an item list")
+	if len(args) != 1 {
+		return "", fmt.Errorf("createBill requires one argument. An item list")
 	}
 
 	/// GET ARGUMENTS
-	billId = args[0]
-	err = json.Unmarshal([]byte(args[1]), &items)
+	err = json.Unmarshal([]byte(args[0]), &items)
 	if err != nil {
 		return "", fmt.Errorf("Cannot unmarshal item list: %s", err)
 	}
-	ownerId = args[2]
-	println("Bill ID:", billId)
-	println("Owner ID:", ownerId)
-	println("Bill Items: ", args[1])
 
 	/// COMPUTE BILL
+	ownerId, _ = getPublicKey()
+	billId = STUB.GetTxID()
 	bill = getBill(ownerId, items)
 	billBytes, err = json.Marshal(bill)
 	if err != nil {
 		return "", fmt.Errorf("Cannot marshal resulting bill: %s", err)
 	}
 
+	println("Bill ID:", billId)
+	println("Owner ID:", ownerId)
+	println("Bill Items: ", args[0])
 	/// PUT STATE
 	err = STUB.PutState(billId, []byte(billBytes))
 	if err != nil {
