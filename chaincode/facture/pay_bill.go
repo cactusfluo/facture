@@ -65,12 +65,12 @@ func	payBill(args []string) (string, error) {
 	var	billId		string
 	var	ccArgs		[][]byte
 
-	/// CHECK ARGUMENTS
+	/// CHECK ARGUMENT
 	if len(args) != 1 {
 		return "", fmt.Errorf("payBill requires one argument. A bill ID")
 	}
 
-	/// GET ARGUMENTS
+	/// GET ARGUMENT
 	billId = args[0]
 
 	/// GET BILL
@@ -86,21 +86,24 @@ func	payBill(args []string) (string, error) {
 		return "", fmt.Errorf("Cannot unmarshal bill: %s", err)
 	}
 
+	/// DELETE BILL FROM LEDGER
+	err = STUB.DelState(string(billId))
+	if err != nil {
+		return "", fmt.Errorf("Cannot delete bill: %s", err)
+	}
+
+	/// DELETE BILL FROM OWNER
+	err = deleteBill(bill.Owner, billId)
+	if err != nil {
+		return "", err
+	}
+
 	/// CALL CHAINCODE TO PAY BILL
 	ccArgs = toChaincodeArgs("transfer", bill.OwnerId, string(bill.TotalAmount))
 	response := STUB.InvokeChaincode("ptwist", ccArgs, "ptwist")
 	if response.Status != shim.OK {
 		return "", fmt.Errorf("Cannot transfer assets for the bill: %s", response.Message)
 	}
-
-	/// DELETE BILL FROM LEDGER
-	err = STUB.DelState(string(billBytes))
-	if err != nil {
-		return "", fmt.Errorf("Cannot delete bill: %s", err)
-	}
-
-	/// DELETE BILL FROM OWNER
-	deleteBill(bill.OwnerIfmt.Errorf("Cannot find bill Id in owner object")d, billId)
 
 	return string(billBytes), nil
 }

@@ -85,7 +85,10 @@ func	createBill(args []string) (string, error) {
 	}
 
 	/// ADD BILL TO USER
-	addBill(ownerId, billId)
+	err = addBill(ownerId, billId)
+	if err != nil {
+		return "", err
+	}
 	println("Bill ID:", billId)
 	println("Owner ID:", ownerId)
 	println("Bill Items: ", args[0])
