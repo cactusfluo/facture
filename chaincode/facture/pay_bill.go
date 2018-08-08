@@ -26,19 +26,15 @@ func	payBill(args []string) (string, error) {
 	var	bill		Bill
 	var	billBytes	[]byte
 	var	billId		string
-	var	payerId		string
 	var	ccArgs		[][]byte
 
 	/// CHECK ARGUMENTS
-	if len(args) != 2 {
+	if len(args) != 1 {
 		return "", fmt.Errorf("payBill requires one argument. A bill ID")
 	}
 
 	/// GET ARGUMENTS
 	billId = args[0]
-	payerId = args[1]
-	println("Bill ID:", billId)
-	println("Payer ID:", payerId)
 
 	/// GET BILL
 	billBytes, err = STUB.GetState(billId)
