@@ -1,3 +1,6 @@
+chaincode/sacc/sacc
+chaincode/facture/facture
+
 .*.swp
 */.*.swp
 */*/.*.swp
