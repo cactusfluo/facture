@@ -93,7 +93,7 @@ func	payBill(args []string) (string, error) {
 	}
 
 	/// DELETE BILL FROM OWNER
-	err = deleteBill(bill.Owner, billId)
+	err = deleteBill(bill.OwnerId, billId)
 	if err != nil {
 		return "", err
 	}
