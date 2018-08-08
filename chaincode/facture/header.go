@@ -5,13 +5,17 @@ import	"github.com/hyperledger/fabric/core/chaincode/shim"
 type	SimpleAsset	struct {
 }
 
-type	Events		struct {
+type	Item		struct {
+		Name		string
 		Amount		uint64
-		Allowances	map[string]uint64
-		From		string
-		To			string
-		Value		uint64
+		Count		uint64
 }
 
-var		STUB shim.ChaincodeStubInterface
-var		LOG *shim.ChaincodeLogger
+type	Bill		struct {
+		OwnerId		string
+		Items		[]Item
+		TotalAmount	uint64
+}
+
+var		STUB		shim.ChaincodeStubInterface
+var		LOG			*shim.ChaincodeLogger

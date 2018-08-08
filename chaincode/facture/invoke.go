@@ -1,39 +1,12 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/hyperledger/fabric/core/chaincode/shim"
-	"github.com/hyperledger/fabric/protos/peer"
-)
+import	"fmt"
+import	"github.com/hyperledger/fabric/core/chaincode/shim"
+import	"github.com/hyperledger/fabric/protos/peer"
 
 /* ************************************************************************** */
 /*		PUBLIC																  */
 /* ************************************************************************** */
-
-func gethistory(stub shim.ChaincodeStubInterface, args []string) (string, error) {
-	if len(args) != 1 {
-		return "", fmt.Errorf("Incorrect arguments. Expecting a key")
-	}
-
-	value, err := stub.GetHistoryForKey(args[0])
-
-	if err != nil {
-		return "", fmt.Errorf("Failed to get asset: %s with error: %s", args[0], err)
-	}
-	if value == nil {
-		return "", fmt.Errorf("Asset not found: %s", args[0])
-	}
-
-	var history string
-	history = "\n"
-
-	for value.HasNext() {
-		history = fmt.Sprintf("%s%s", history, fmt.Sprintln(value.Next()))
-	}
-
-	return string(history), nil
-}
 
 // toChaincodeArgs converts string args to []byte args
 func toChaincodeArgs(args ...string) [][]byte {
@@ -50,22 +23,21 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	var ret string
 	var err error
 
+	/// GET FUNCTION AND PARAMETERS
 	fct, argv = stub.GetFunctionAndParameters()
-	if fct != "balanceOf" && fct != "whoOwesMe" && fct != "whoOweI" { // TEMP
-		fmt.Println("---------------> Invoke <---------------")
-	}
 
+	/// INIT ENVIRONNEMENT
 	STUB = stub
 	LOG = shim.NewLogger("Pcoin")
 	LOG.SetLevel(shim.LogInfo)
 
+	/// LAUNCH FUNCTION
 	switch fct {
-	// Temporary, not in production
-	case "get":
+	case "createBill":
 		ret, err = _get(argv)
-	case "history":
-		ret, err = gethistory(stub, argv)
-	case "remoteinvoke":
+	case "payBill":
+		ret, err = _get(argv)
+	case "listBills":
 		chainCodeArgs := toChaincodeArgs("get", "a")
 		response := stub.InvokeChaincode("sacc", chainCodeArgs, "myc")
 		if response.Status != shim.OK {
@@ -76,6 +48,7 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		err = fmt.Errorf("Illegal function called \n")
 	}
 
+	/// CHECK ERROR
 	if err != nil {
 		LOG.Error(err)
 		return shim.Error(err.Error())
