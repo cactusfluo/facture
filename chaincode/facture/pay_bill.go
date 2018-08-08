@@ -2,6 +2,7 @@ package	main
 
 import	"fmt"
 import	"encoding/json"
+import	"github.com/hyperledger/fabric/core/chaincode/shim"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// STATIC FUNCTIONS
@@ -54,16 +55,16 @@ func	payBill(args []string) (string, error) {
 
 	/// CALL CHAINCODE TO PAY BILL
 	ccArgs = toChaincodeArgs("transfer", bill.OwnerId, string(bill.TotalAmount))
-	response := stub.InvokeChaincode("ptwist", ccArgs, "ptwist")
+	response := STUB.InvokeChaincode("ptwist", ccArgs, "ptwist")
 	if response.Status != shim.OK {
-		return shim.Error(response.Message)
+		return "", fmt.Errorf("Cannot transfer assets for the bill: %s", response.Message)
 	}
 
 	/// DELETE BILL
-	err = STUB.DelState(billBytes)
+	err = STUB.DelState(string(billBytes))
 	if err != nil {
 		return "", fmt.Errorf("Cannot delete bill: %s", err)
 	}
 
-	return string(billMarshal), nil
+	return string(billBytes), nil
 }

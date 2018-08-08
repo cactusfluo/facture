@@ -48,7 +48,7 @@ func	createBill(args []string) (string, error) {
 	ownerId = args[2]
 	println("Bill ID:", billId)
 	println("Owner ID:", ownerId)
-	println("Bill Items: ", string(items))
+	println("Bill Items: ", args[1])
 
 	/// COMPUTE BILL
 	bill = getBill(ownerId, items)
