@@ -34,7 +34,7 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	/// LAUNCH FUNCTION
 	switch fct {
 	case "createBill":
-		ret, err = _get(argv)
+		ret, err = createBill(argv)
 	case "payBill":
 		ret, err = _get(argv)
 	case "listBills":
