@@ -60,7 +60,7 @@ func	createBill(args []string) (string, error) {
 		return "", fmt.Errorf("createBill requires one argument. An item list")
 	}
 
-	/// GET ARGUMENTS
+	/// GET ARGUMENT
 	err = json.Unmarshal([]byte(args[0]), &items)
 	if err != nil {
 		return "", fmt.Errorf("Cannot unmarshal item list: %s", err)
@@ -78,16 +78,17 @@ func	createBill(args []string) (string, error) {
 		return "", fmt.Errorf("Cannot marshal resulting bill: %s", err)
 	}
 
+	/// PUT BILL TO LEDGER
+	err = STUB.PutState(billId, []byte(billBytes))
+	if err != nil {
+		return "", fmt.Errorf("Cannot set bill into ledger: %s", err)
+	}
+
 	/// ADD BILL TO USER
 	addBill(ownerId, billId)
 	println("Bill ID:", billId)
 	println("Owner ID:", ownerId)
 	println("Bill Items: ", args[0])
-	/// PUT BILL
-	err = STUB.PutState(billId, []byte(billBytes))
-	if err != nil {
-		return "", fmt.Errorf("Cannot set bill into ledger: %s", err)
-	}
 
 	return string(billBytes), nil
 }
