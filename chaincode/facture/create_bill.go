@@ -22,6 +22,27 @@ func	getBill(ownerId string, items []Item) Bill {
 	return bill
 }
 
+func	addBill(ownerId string, billId string) error {
+	var	err			error
+	var	user		UserInfos
+	var	userBytes	[]byte
+
+	user, err = getUserInfos(ownerId)
+	if err != nil {
+		return fmt.Errorf("Cannot get user informations: %s", err)
+	}
+	user.Bills = append(user.Bills, billId)
+	userBytes, err = json.Marshal(user)
+	if err != nil {
+		return fmt.Errorf("Cannot marshal user object: %s", err)
+	}
+	err = STUB.PutState(ownerId, userBytes)
+	if err != nil {
+		return fmt.Errorf("Cannot update user object: %s", err)
+	}
+	return nil
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +67,10 @@ func	createBill(args []string) (string, error) {
 	}
 
 	/// COMPUTE BILL
-	ownerId, _ = getPublicKey()
+	ownerId, err = getPublicKey()
+	if err != nil {
+		return "", fmt.Errorf("Cannot user public key: %s", err)
+	}
 	billId = STUB.GetTxID()
 	bill = getBill(ownerId, items)
 	billBytes, err = json.Marshal(bill)
@@ -54,13 +78,15 @@ func	createBill(args []string) (string, error) {
 		return "", fmt.Errorf("Cannot marshal resulting bill: %s", err)
 	}
 
+	/// ADD BILL TO USER
+	addBill(ownerId, billId)
 	println("Bill ID:", billId)
 	println("Owner ID:", ownerId)
 	println("Bill Items: ", args[0])
-	/// PUT STATE
+	/// PUT BILL
 	err = STUB.PutState(billId, []byte(billBytes))
 	if err != nil {
-		return "", fmt.Errorf("Failed to set bill into ledger: %s", err)
+		return "", fmt.Errorf("Cannot set bill into ledger: %s", err)
 	}
 
 	return string(billBytes), nil
