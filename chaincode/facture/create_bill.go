@@ -69,7 +69,7 @@ func	createBill(args []string) (string, error) {
 	/// COMPUTE BILL
 	ownerId, err = getPublicKey()
 	if err != nil {
-		return "", fmt.Errorf("Cannot user public key: %s", err)
+		return "", fmt.Errorf("Cannot get user public key: %s", err)
 	}
 	billId = STUB.GetTxID()
 	bill = getBill(ownerId, items)

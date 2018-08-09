@@ -21,6 +21,13 @@ type	Bill		struct {
 		TotalAmount	uint64
 }
 
+type	BillInfos	struct {
+		OwnerId		string
+		BillId		string
+		Items		[]Item
+		TotalAmount	uint64
+}
+
 type	UserInfos	struct {
 		Amount		uint64
 		Allowances	map[string]uint64
