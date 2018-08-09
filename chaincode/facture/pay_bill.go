@@ -105,5 +105,5 @@ func	payBill(args []string) (string, error) {
 		return "", fmt.Errorf("Cannot transfer assets for the bill: %s", response.Message)
 	}
 
-	return string(billBytes), nil
+	return "Success", nil
 }

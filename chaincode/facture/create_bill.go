@@ -93,5 +93,5 @@ func	createBill(args []string) (string, error) {
 	println("Owner ID:", ownerId)
 	println("Bill Items: ", args[0])
 
-	return string(billBytes), nil
+	return billId, nil
 }
