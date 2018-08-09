@@ -27,18 +27,27 @@ func	addBill(ownerId string, billId string) error {
 	var	user		UserInfos
 	var	userBytes	[]byte
 
-	user, err = getUserInfos(ownerId)
+	/// GET USER
+	userBytes, err = STUB.GetState(ownerId)
 	if err != nil {
 		return fmt.Errorf("Cannot get user informations: %s", err)
 	}
+	/// IF EXISTANT
+	if userBytes != nil {
+		err = json.Unmarshal(userBytes, &user)
+		if err != nil {
+			return fmt.Errorf("Cannot unmarshal user informations: %s", err)
+		}
+	}
+
 	user.Bills = append(user.Bills, billId)
 	userBytes, err = json.Marshal(user)
 	if err != nil {
-		return fmt.Errorf("Cannot marshal user object: %s", err)
+		return fmt.Errorf("Cannot marshal user informations: %s", err)
 	}
 	err = STUB.PutState(ownerId, userBytes)
 	if err != nil {
-		return fmt.Errorf("Cannot update user object: %s", err)
+		return fmt.Errorf("Cannot update user informations: %s", err)
 	}
 	return nil
 }

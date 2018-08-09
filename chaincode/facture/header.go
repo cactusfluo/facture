@@ -29,8 +29,6 @@ type	BillInfos	struct {
 }
 
 type	UserInfos	struct {
-		Amount		uint64
-		Allowances	map[string]uint64
 		Bills		[]string
 }
 
