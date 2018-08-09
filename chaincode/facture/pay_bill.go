@@ -1,15 +1,15 @@
-package	main
+package main
 
-import	"fmt"
-import	"encoding/json"
-import	"github.com/hyperledger/fabric/core/chaincode/shim"
+import "fmt"
+import "encoding/json"
+import "github.com/hyperledger/fabric/core/chaincode/shim"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-func	toChaincodeArgs(args ...string) [][]byte {
-	var	bargs		[][]byte
+func toChaincodeArgs(args ...string) [][]byte {
+	var bargs [][]byte
 	bargs = make([][]byte, len(args))
 	for i, arg := range args {
 		bargs[i] = []byte(arg)
@@ -17,9 +17,9 @@ func	toChaincodeArgs(args ...string) [][]byte {
 	return bargs
 }
 
-func	removeBillFromList(list []string, billId string) ([]string, error) {
-	var	i			int
-	var	id			string
+func removeBillFromList(list []string, billId string) ([]string, error) {
+	var i int
+	var id string
 
 	for i, id = range list {
 		if id == billId {
@@ -30,10 +30,10 @@ func	removeBillFromList(list []string, billId string) ([]string, error) {
 	return nil, fmt.Errorf("Cannot find bill Id in owner object")
 }
 
-func	deleteBill(ownerId string, billId string) error {
-	var	err			error
-	var	user		UserInfos
-	var	userBytes	[]byte
+func deleteBill(ownerId string, billId string) error {
+	var err error
+	var user UserInfos
+	var userBytes []byte
 
 	user, err = getUserInfos(ownerId)
 	if err != nil {
@@ -58,12 +58,12 @@ func	deleteBill(ownerId string, billId string) error {
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-func	payBill(args []string) (string, error) {
-	var	err			error
-	var	bill		Bill
-	var	billBytes	[]byte
-	var	billId		string
-	var	ccArgs		[][]byte
+func payBill(args []string) (string, error) {
+	var err error
+	var bill Bill
+	var billBytes []byte
+	var billId string
+	var ccArgs [][]byte
 
 	/// CHECK ARGUMENT
 	if len(args) != 1 {
@@ -99,8 +99,10 @@ func	payBill(args []string) (string, error) {
 	}
 
 	/// CALL CHAINCODE TO PAY BILL
-	ccArgs = toChaincodeArgs("transfer", bill.OwnerId, string(bill.TotalAmount))
-	response := STUB.InvokeChaincode("ptwist", ccArgs, "ptwist")
+	ccArgs = toChaincodeArgs("transfer", bill.OwnerId, fmt.Sprintf("%d", bill.TotalAmount))
+	//InvokeChaincode(chaincodeName string, args [][]byte, channel string)
+	response := STUB.InvokeChaincode("ERC20", ccArgs, "ptwist")
+
 	if response.Status != shim.OK {
 		return "", fmt.Errorf("Cannot transfer assets for the bill: %s", response.Message)
 	}
