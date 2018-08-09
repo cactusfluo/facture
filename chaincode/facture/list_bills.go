@@ -57,11 +57,16 @@ func	getBillList(user UserInfos) ([]BillInfos, error) {
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-func	list_bills() (string, error) {
+func	listBills(args []string) (string, error) {
 	var	err			error
 	var	user		UserInfos
 	var	list		[]BillInfos
 	var	listBytes	[]byte
+
+	/// CHECK ARGUMENTS
+	if len(args) != 0 {
+		return "", fmt.Errorf("listBills does not require any argument")
+	}
 
 	/// GET USER
 	user, err = getUser()
