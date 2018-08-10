@@ -87,7 +87,9 @@ func payBill(args []string) (string, error) {
 	}
 
 	/// DELETE BILL FROM LEDGER
-	err = STUB.DelState(string(billId))
+	//err = STUB.DelState(string(billId))
+	//quick & dirty
+	err = STUB.PutState(string(billId), []byte("paid"))
 	if err != nil {
 		return "", fmt.Errorf("Cannot delete bill: %s", err)
 	}
